@@ -21,6 +21,11 @@ func main() {
 // create "Command" too run the same executable -> proc self exe is the currently runing program 
 func parent() {
 	cmd := exec.Command("/proc/self/exe", append([]string{"child"}, os.Args[2:]...)...) // append rest of cli arguments after "child"
+	// add  UTS, PID, MNT namespaces
+	cmd.SysProcAttr = &syscall.SysProcAttr{
+		Cloneflags: syscall.CLONE_NEWUTS | syscall.CLONE_NEWPID | syscall.CLONE_NEWNS,
+	}
+
 	// set input, output, and error streams to the streams of parent process
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
